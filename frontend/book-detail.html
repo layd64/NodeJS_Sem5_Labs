@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деталі книжки - Книжковий магазин</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="nav-link">Головна</a>
+            <a href="books.html" class="nav-link">Каталог</a>
+            <a href="genres.html" class="nav-link">Жанри</a>
+            <div class="auth-links">
+                <a href="login.html" class="nav-link" id="login-link">Вхід</a>
+                <a href="register.html" class="nav-link" id="register-link">Реєстрація</a>
+                <span id="user-info" class="hidden"></span>
+                <a href="#" class="nav-link hidden" id="logout-link">Вихід</a>
+            </div>
+        </nav>
+        <h1>Книжковий магазин</h1>
+    </header>
+    <main id="main-content">
+        <section id="book-detail">
+            <div class="loading">Завантаження...</div>
+        </section>
+        <section id="reviews-section" class="hidden">
+            <h2>Відгуки</h2>
+            <div id="reviews-container"></div>
+            <div id="add-review-form" class="hidden">
+                <h3>Додати відгук</h3>
+                <form onsubmit="submitReview(event)">
+                    <div class="form-group">
+                        <label>Рейтинг (1-5):</label>
+                        <input type="number" id="review-rating" min="1" max="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Коментар:</label>
+                        <textarea id="review-comment" required></textarea>
+                    </div>
+                    <button type="submit">Додати відгук</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Книжковий магазин - REST API</p>
+    </footer>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/book-detail.js"></script>
+</body>
+</html>
+
