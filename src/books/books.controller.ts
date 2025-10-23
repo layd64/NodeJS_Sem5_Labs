@@ -22,8 +22,8 @@ export class BooksController {
   ) {}
 
   @Get()
-  findAll(@Query() query: BookQueryDto): BookListResponseDto {
-    const books = this.booksService.findAll(query);
+  async findAll(@Query() query: BookQueryDto): Promise<BookListResponseDto> {
+    const books = await this.booksService.findAll(query);
     const booksDto = books.map((book) => this.mapToDto(book));
     
     return {
@@ -33,15 +33,15 @@ export class BooksController {
   }
 
   @Get('genres')
-  getGenres(): { genres: string[] } {
-    const genres = this.booksService.getGenres();
+  async getGenres(): Promise<{ genres: string[] }> {
+    const genres = await this.booksService.getGenres();
     return { genres };
   }
 
   @Get(':id/reviews')
   async getBookReviews(@Param('id') bookId: string): Promise<{ reviews: ReviewResponseDto[]; book?: BookResponseDto }> {
     const reviews = await this.usersService.getBookReviews(bookId);
-    const book = this.booksService.findOne(bookId);
+    const book = await this.booksService.findOne(bookId);
 
     return {
       reviews,
@@ -50,8 +50,8 @@ export class BooksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): BookResponseDto {
-    const book = this.booksService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<BookResponseDto> {
+    const book = await this.booksService.findOne(id);
     if (!book) {
       throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }

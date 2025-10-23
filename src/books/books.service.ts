@@ -1,63 +1,56 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { Book, BookFilters } from '../common/interfaces/book.interface';
-import { FileStorageService } from '../common/services/file-storage.service';
-import { BOOKS, GENRES } from '../data/books.data';
+import { PrismaService } from '../common/services/prisma.service';
 
 @Injectable()
-export class BooksService implements OnModuleInit {
-  private books: Book[] = [];
-  private readonly storageFilename = 'books.json';
+export class BooksService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  constructor(private readonly fileStorage: FileStorageService) {}
-
-  async onModuleInit() {
-    await this.loadBooks();
-  }
-
-  private async loadBooks(): Promise<void> {
-    this.books = await this.fileStorage.readFile<Book[]>(this.storageFilename, [...BOOKS]);
-  }
-
-  private async saveBooks(): Promise<void> {
-    await this.fileStorage.writeFile(this.storageFilename, this.books);
-  }
-
-  findAll(filters?: BookFilters): Book[] {
-    let filteredBooks = [...this.books];
+  async findAll(filters?: BookFilters): Promise<Book[]> {
+    const where: any = {};
 
     if (filters?.genre) {
-      filteredBooks = filteredBooks.filter((book) => book.genre === filters.genre);
+      where.genre = filters.genre;
     }
 
     if (filters?.search) {
-      const searchLower = filters.search.toLowerCase();
-      filteredBooks = filteredBooks.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchLower) ||
-          book.author.toLowerCase().includes(searchLower),
-      );
+      const search = filters.search.toLowerCase();
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { author: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
-    if (filters?.minPrice !== undefined && filters.minPrice !== null) {
-      const minPrice = filters.minPrice;
-      filteredBooks = filteredBooks.filter((book) => book.price >= minPrice);
+    if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+      where.price = {};
+      if (filters.minPrice !== undefined && filters.minPrice !== null) {
+        where.price.gte = Math.floor(filters.minPrice);
+      }
+      if (filters.maxPrice !== undefined && filters.maxPrice !== null) {
+        where.price.lte = Math.floor(filters.maxPrice);
+      }
     }
 
-    if (filters?.maxPrice !== undefined && filters.maxPrice !== null) {
-      const maxPrice = filters.maxPrice;
-      filteredBooks = filteredBooks.filter((book) => book.price <= maxPrice);
-    }
+    const books = await this.prisma.book.findMany({
+      where,
+      orderBy: { title: 'asc' },
+    });
 
-    return filteredBooks;
+    return books as unknown as Book[];
   }
 
-  findOne(id: string): Book | undefined {
-    return this.books.find((book) => book.id === id);
+  async findOne(id: string): Promise<Book | undefined> {
+    const book = await this.prisma.book.findUnique({ where: { id } });
+    return book as unknown as Book | undefined;
   }
 
-  getGenres(): string[] {
-    const genres = Array.from(new Set(this.books.map((book) => book.genre)));
-    return genres.length > 0 ? genres : GENRES;
+  async getGenres(): Promise<string[]> {
+    const genres = await this.prisma.book.findMany({
+      select: { genre: true },
+      distinct: ['genre'],
+      orderBy: { genre: 'asc' },
+    });
+    return genres.map((g) => g.genre);
   }
 }

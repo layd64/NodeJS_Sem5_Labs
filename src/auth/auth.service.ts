@@ -1,53 +1,33 @@
-import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { AuthResponseDto, LoginDto, RegisterDto } from '../common/dto/auth.dto';
 import { User } from '../common/interfaces/user.interface';
-import { FileStorageService } from '../common/services/file-storage.service';
-import { USERS } from '../data/users.data';
+import { PrismaService } from '../common/services/prisma.service';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
-  private users: User[] = [];
-  private readonly storageFilename = 'users.json';
-
-  constructor(private readonly fileStorage: FileStorageService) {}
-
-  async onModuleInit() {
-    await this.loadUsers();
-  }
-
-  private async loadUsers(): Promise<void> {
-    this.users = await this.fileStorage.readFile<User[]>(this.storageFilename, [...USERS]);
-  }
-
-  private async saveUsers(): Promise<void> {
-    await this.fileStorage.writeFile(this.storageFilename, this.users);
-  }
+export class AuthService {
+  constructor(private readonly prisma: PrismaService) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    await this.loadUsers();
-    
-    const existingUser = this.users.find((user) => user.email === registerDto.email);
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
     if (existingUser) {
       throw new HttpException('User with this email already exists', HttpStatus.CONFLICT);
     }
 
-    const newUser: User = {
-      id: String(this.users.length + 1),
-      email: registerDto.email,
-      password: registerDto.password,
-      name: registerDto.name,
-      savedBooks: [],
-      createdAt: new Date(),
-    };
-
-    this.users.push(newUser);
-    await this.saveUsers();
+    const newUser = await this.prisma.user.create({
+      data: {
+        email: registerDto.email,
+        password: registerDto.password,
+        name: registerDto.name,
+      },
+    });
 
     return {
-      token: this.generateToken(newUser.id),
+      token: this.generateToken(newUser.id as unknown as string),
       user: {
-        id: newUser.id,
+        id: newUser.id as unknown as string,
         email: newUser.email,
         name: newUser.name,
       },
@@ -55,20 +35,18 @@ export class AuthService implements OnModuleInit {
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    await this.loadUsers();
-    
-    const user = this.users.find(
-      (u) => u.email === loginDto.email && u.password === loginDto.password,
-    );
+    const user = await this.prisma.user.findFirst({
+      where: { email: loginDto.email, password: loginDto.password },
+    });
 
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
     return {
-      token: this.generateToken(user.id),
+      token: this.generateToken(user.id as unknown as string),
       user: {
-        id: user.id,
+        id: user.id as unknown as string,
         email: user.email,
         name: user.name,
       },
@@ -76,17 +54,27 @@ export class AuthService implements OnModuleInit {
   }
 
   async getUserProfile(userId: string): Promise<User | undefined> {
-    await this.loadUsers();
-    return this.users.find((user) => user.id === userId);
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return undefined;
+    return {
+      id: user.id as unknown as string,
+      email: user.email,
+      password: user.password,
+      name: user.name,
+      savedBooks: [],
+      createdAt: user.createdAt as unknown as Date,
+    };
   }
 
   async updateUser(userId: string, updates: Partial<User>): Promise<void> {
-    await this.loadUsers();
-    const user = this.users.find((u) => u.id === userId);
-    if (user) {
-      Object.assign(user, updates);
-      await this.saveUsers();
-    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: updates.email,
+        password: updates.password,
+        name: updates.name,
+      },
+    });
   }
 
   private generateToken(userId: string): string {

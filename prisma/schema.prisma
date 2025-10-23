@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  name       String
+  createdAt  DateTime @default(now())
+  reviews    Review[]
+  cart       Cart?
+  savedBooks UserSavedBook[]
+}
+
+model Book {
+  id          String   @id
+  title       String
+  author      String
+  year        Int
+  price       Int
+  genre       String
+  description String
+  isbn        String?
+  reviews     Review[]
+  cartItems   CartItem[]
+  savedBy     UserSavedBook[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  userId String  @id
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  CartItem[]
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  cartId   String
+  bookId   String
+  quantity Int
+  cart     Cart   @relation(fields: [cartId], references: [userId], onDelete: Cascade)
+  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  @@unique([cartId, bookId])
+}
+
+model UserSavedBook {
+  id     String @id @default(cuid())
+  userId String
+  bookId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  @@unique([userId, bookId])
+}
+
+
