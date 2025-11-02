@@ -98,9 +98,9 @@
 - **Функціонал**: Чистий REST API, що повертає JSON відповіді
 
 ### Frontend (Клієнтська частина)
-- **Технології**: HTML, CSS, Vanilla JavaScript
-- **Порт**: 8080
-- **Функціонал**: SPA-подібний застосунок з динамічним контентом
+- **Технології**: React, TypeScript, Vite
+- **Порт**: 5173
+- **Функціонал**: SPA застосунок з використанням React Hooks та Context API
 
 ## Початок роботи
 
@@ -121,12 +121,10 @@ Backend API стартує на `http://localhost:3000/api`
 ```bash
 npm run start:frontend
 ```
-Frontend стартує на `http://localhost:8080`
+Frontend стартує на `http://localhost:5173`
 
 **Альтернативні способи запуску frontend:**
-- Python: `cd frontend && python3 -m http.server 8080`
-- Node.js: `cd frontend && npx http-server -p 8080`
-- Будь-який інший статичний сервер
+- `cd frontend && npm run dev`
 
 ### Збірка та продакшн-запуск
 ```bash
@@ -143,64 +141,70 @@ npm run format
 ## Структура проекту
 
 ```
-├── src/                    # Backend (NestJS API)
-│   ├── auth/               # Модуль авторизації
-│   │   ├── auth.controller.ts
-│   │   ├── auth.service.ts
-│   │   └── auth.module.ts
-│   ├── books/              # Модуль книжок
-│   │   ├── books.controller.ts
-│   │   ├── books.service.ts
-│   │   └── books.module.ts
-│   ├── cart/               # Модуль кошика
-│   │   ├── cart.controller.ts
-│   │   ├── cart.service.ts
-│   │   └── cart.module.ts
-│   ├── common/             # Спільні DTO та інтерфейси
-│   │   ├── dto/
-│   │   │   ├── auth.dto.ts
-│   │   │   ├── book.dto.ts
-│   │   │   ├── cart.dto.ts
-│   │   │   └── review.dto.ts
-│   │   └── interfaces/
-│   │       ├── book.interface.ts
-│   │       ├── cart.interface.ts
-│   │       ├── review.interface.ts
-│   │       └── user.interface.ts
-│   ├── data/               # Статичні дані
-│   │   ├── books.data.ts
-│   │   ├── carts.data.ts
-│   │   ├── reviews.data.ts
-│   │   └── users.data.ts
-│   ├── home/               # Головна сторінка API
-│   │   ├── home.controller.ts
-│   │   └── home.module.ts
-│   ├── users/              # Модуль користувачів
-│   │   ├── users.controller.ts
-│   │   ├── users.service.ts
-│   │   └── users.module.ts
-│   ├── app.module.ts       # Головний модуль
-│   └── main.ts             # Точка входу
+├── backend/                # Backend (NestJS API)
+│   ├── src/
+│   │   ├── auth/           # Модуль авторизації
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   └── auth.module.ts
+│   │   ├── books/          # Модуль книжок
+│   │   │   ├── books.controller.ts
+│   │   │   ├── books.service.ts
+│   │   │   └── books.module.ts
+│   │   ├── cart/           # Модуль кошика
+│   │   │   ├── cart.controller.ts
+│   │   │   ├── cart.service.ts
+│   │   │   └── cart.module.ts
+│   │   ├── common/         # Спільні DTO та інтерфейси
+│   │   │   ├── dto/
+│   │   │   │   ├── auth.dto.ts
+│   │   │   │   ├── book.dto.ts
+│   │   │   │   ├── cart.dto.ts
+│   │   │   │   └── review.dto.ts
+│   │   │   ├── interfaces/
+│   │   │   │   ├── book.interface.ts
+│   │   │   │   ├── cart.interface.ts
+│   │   │   │   ├── review.interface.ts
+│   │   │   │   └── user.interface.ts
+│   │   │   └── services/
+│   │   │       ├── prisma.module.ts
+│   │   │       └── prisma.service.ts
+│   │   ├── home/           # Головна сторінка API
+│   │   │   ├── home.controller.ts
+│   │   │   └── home.module.ts
+│   │   ├── users/          # Модуль користувачів
+│   │   │   ├── users.controller.ts
+│   │   │   ├── users.service.ts
+│   │   │   └── users.module.ts
+│   │   ├── app.module.ts   # Головний модуль
+│   │   └── main.ts         # Точка входу
+│   ├── prisma/             # Prisma ORM
+│   │   ├── schema.prisma   # Схема бази даних
+│   │   ├── migrations/     # Міграції бази даних
+│   │   └── seed.ts         # Seed файл для заповнення БД
+│   └── test/               # E2E тести
+│       ├── app.e2e-spec.ts
+│       └── jest-e2e.json
 │
-└── frontend/               # Frontend (HTML/CSS/JS)
-    ├── index.html          # Головна сторінка
-    ├── books.html          # Каталог книжок
-    ├── book-detail.html    # Деталі книжки
-    ├── genres.html         # Жанри
-    ├── login.html          # Вхід
-    ├── register.html       # Реєстрація
-    ├── cart.html           # Кошик
-    ├── profile.html        # Профіль користувача
-    ├── styles/
-    │   └── main.css        # Основні стилі
-    └── js/
-        ├── api.js          # API клієнт
-        ├── auth.js         # Управління авторизацією
-        ├── main.js         # Утиліти
-        ├── books.js        # Логіка каталогу
-        ├── book-detail.js  # Логіка деталей книжки
-        ├── cart.js         # Логіка кошика
-        └── profile.js      # Логіка профілю
+└── frontend/               # Frontend (React + Vite)
+    ├── src/
+    │   ├── components/     # Перевикористовувані компоненти
+    │   ├── context/        # React Context (Auth, Cart, etc.)
+    │   ├── pages/          # Сторінки застосунку
+    │   │   ├── Home.tsx
+    │   │   ├── Books.tsx
+    │   │   ├── BookDetail.tsx
+    │   │   ├── Login.tsx
+    │   │   ├── Register.tsx
+    │   │   ├── Cart.tsx
+    │   │   ├── Profile.tsx
+    │   │   └── Genres.tsx
+    │   ├── services/       # API сервіси
+    │   ├── App.tsx         # Головний компонент
+    │   └── main.tsx        # Точка входу
+    ├── index.html          # HTML шаблон
+    ├── package.json        # Залежності frontend
+    └── vite.config.ts      # Конфігурація Vite
 ```
 
 ## API Ендпоінти
@@ -260,12 +264,11 @@ npm run format
 
 ## Технічні деталі
 
-### Статичні дані
-Проєкт використовує статичні дані, збережені в пам'яті (без підключення до бази даних):
-- Книжки зберігаються в `src/data/books.data.ts`
-- Користувачі зберігаються в `src/data/users.data.ts`
-- Кошики зберігаються в `src/data/carts.data.ts`
-- Відгуки зберігаються в `src/data/reviews.data.ts`
+### База даних
+Проєкт використовує Prisma ORM з PostgreSQL для зберігання даних:
+- Схема бази даних: `backend/prisma/schema.prisma`
+- Міграції: `backend/prisma/migrations/`
+- Seed файл: `backend/prisma/seed.ts`
 
 ### Обробка помилок
 Всі помилки обробляються через `HttpException` з відповідними HTTP статус-кодами:
@@ -283,13 +286,15 @@ npm run format
 ```
 
 ### CORS
-Backend налаштований для роботи з frontend через CORS. За замовчуванням дозволено запити з `http://localhost:8080`. Можна змінити через змінну оточення `FRONTEND_URL`.
+Backend налаштований для роботи з frontend через CORS. За замовчуванням дозволено запити з `http://localhost:5173`. Можна змінити через змінну оточення `FRONTEND_URL`.
 
 ### Frontend
-Frontend застосунок використовує:
-- **API Client** (`js/api.js`) - централізований клієнт для всіх API запитів
-- **Auth Manager** (`js/auth.js`) - управління станом авторизації через localStorage
-- **Модульна структура** - кожна сторінка має свій JS файл з логікою
+Frontend застосунок побудований на сучасному стеку:
+- **React** - бібліотека для побудови інтерфейсів
+- **TypeScript** - для типізації компонентів та даних
+- **Vite** - швидкий зборщик проектів
+- **Context API** - для управління станом (Auth, Cart)
+- **React Router** - для навігації між сторінками
 
 ### Стиль коду
 Проєкт дотримується правил Airbnb Style Guide, налаштованих через ESLint:
