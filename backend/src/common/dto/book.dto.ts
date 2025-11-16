@@ -32,4 +32,8 @@ export class BookQueryDto implements BookFilters {
   minPrice?: number;
 
   maxPrice?: number;
+
+  page?: number;
+
+  limit?: number;
 }
