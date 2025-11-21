@@ -69,6 +69,13 @@ let AuthService = class AuthService {
             createdAt: user.createdAt,
         };
     }
+    async getUserProfileWithoutPassword(userId) {
+        const user = await this.getUserProfile(userId);
+        if (!user)
+            return undefined;
+        const { password, ...profile } = user;
+        return profile;
+    }
     async updateUser(userId, updates) {
         await this.prisma.user.update({
             where: { id: userId },

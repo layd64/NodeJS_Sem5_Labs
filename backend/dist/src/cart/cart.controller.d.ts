@@ -8,4 +8,8 @@ export declare class CartController {
     updateCartItem(userId: string, bookId: string, updateCartItemDto: UpdateCartItemDto): Promise<CartResponseDto>;
     removeFromCart(userId: string, bookId: string): Promise<CartResponseDto>;
     clearCart(userId: string): Promise<void>;
+    checkout(userId: string): Promise<{
+        message: string;
+        total: number;
+    }>;
 }

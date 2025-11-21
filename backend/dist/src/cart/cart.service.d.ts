@@ -8,6 +8,10 @@ export declare class CartService {
     updateCartItem(userId: string, bookId: string, quantity: number): Promise<CartResponseDto>;
     removeFromCart(userId: string, bookId: string): Promise<CartResponseDto>;
     clearCart(userId: string): Promise<void>;
+    checkout(userId: string): Promise<{
+        message: string;
+        total: number;
+    }>;
     private ensureCart;
     private getCartItemsDetailed;
     private calculateTotal;

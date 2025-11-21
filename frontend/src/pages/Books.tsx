@@ -1,66 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { booksApi, cartApi, usersApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-
-interface Book {
-    id: string;
-    title: string;
-    author: string;
-    genre: string;
-    year: number;
-    price: number;
-}
+import { useBooks } from '../hooks/useBooks';
+import { useGenres } from '../hooks/useGenres';
+import { useCartActions } from '../hooks/useCartActions';
 
 const Books: React.FC = () => {
-    const [books, setBooks] = useState<Book[]>([]);
-    const [genres, setGenres] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
-    const { user, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
+    const { books, loading, error } = useBooks();
+    const { genres } = useGenres();
+    const { addToCart, addToSaved } = useCartActions();
 
     // Filters state
     const [search, setSearch] = useState(searchParams.get('search') || '');
     const [genre, setGenre] = useState(searchParams.get('genre') || '');
     const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
     const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-
-    useEffect(() => {
-        fetchGenres();
-    }, []);
-
-    useEffect(() => {
-        fetchBooks();
-    }, [searchParams]);
-
-    const fetchGenres = async () => {
-        try {
-            const response = await booksApi.getGenres();
-            setGenres(response.data.genres);
-        } catch (err) {
-            console.error('Failed to fetch genres', err);
-        }
-    };
-
-    const fetchBooks = async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const filters = {
-                search: searchParams.get('search') || '',
-                genre: searchParams.get('genre') || '',
-                minPrice: searchParams.get('minPrice') || '',
-                maxPrice: searchParams.get('maxPrice') || '',
-            };
-            const response = await booksApi.getAll(filters);
-            setBooks(response.data.books || []);
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch books');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleFilter = () => {
         const params: any = {};
@@ -71,29 +27,21 @@ const Books: React.FC = () => {
         setSearchParams(params);
     };
 
-    const addToCart = async (bookId: string) => {
-        if (!isAuthenticated || !user) {
-            alert('Будь ласка, увійдіть в систему');
-            return;
-        }
+    const handleAddToCart = async (bookId: string) => {
         try {
-            await cartApi.addItem(user.id, bookId, 1);
+            await addToCart(bookId);
             alert('Книжку додано до кошика!');
         } catch (err: any) {
-            alert('Помилка: ' + (err.response?.data?.message || err.message));
+            alert('Помилка: ' + (err.message || 'Не вдалося додати до кошика'));
         }
     };
 
-    const addToSaved = async (bookId: string) => {
-        if (!isAuthenticated || !user) {
-            alert('Будь ласка, увійдіть в систему');
-            return;
-        }
+    const handleAddToSaved = async (bookId: string) => {
         try {
-            await usersApi.addSavedBook(user.id, bookId);
+            await addToSaved(bookId);
             alert('Книжку додано до збережених!');
         } catch (err: any) {
-            alert('Помилка: ' + (err.response?.data?.message || err.message));
+            alert('Помилка: ' + (err.message || 'Не вдалося додати до збережених'));
         }
     };
 
@@ -159,8 +107,8 @@ const Books: React.FC = () => {
                                 <Link to={`/books/${book.id}`}><button>Деталі</button></Link>
                                 {isAuthenticated && (
                                     <>
-                                        <button onClick={() => addToCart(book.id)}>До кошика</button>
-                                        <button onClick={() => addToSaved(book.id)}>Зберегти</button>
+                                        <button onClick={() => handleAddToCart(book.id)}>До кошика</button>
+                                        <button onClick={() => handleAddToSaved(book.id)}>Зберегти</button>
                                     </>
                                 )}
                             </div>

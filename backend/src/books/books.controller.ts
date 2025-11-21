@@ -9,7 +9,7 @@ import {
 
 import { BookListResponseDto, BookQueryDto, BookResponseDto } from '../common/dto/book.dto';
 import { ReviewResponseDto } from '../common/dto/review.dto';
-import { Book } from '../common/interfaces/book.interface';
+import { BookMapper } from '../common/mappers/book.mapper';
 import { UsersService } from '../users/users.service';
 
 import { BooksService } from './books.service';
@@ -24,7 +24,7 @@ export class BooksController {
   @Get()
   async findAll(@Query() query: BookQueryDto): Promise<BookListResponseDto> {
     const books = await this.booksService.findAll(query);
-    const booksDto = books.map((book) => this.mapToDto(book));
+    const booksDto = BookMapper.toDtoList(books);
     
     return {
       books: booksDto,
@@ -45,7 +45,7 @@ export class BooksController {
 
     return {
       reviews,
-      book: book ? this.mapToDto(book) : undefined,
+      book: book ? BookMapper.toDto(book) : undefined,
     };
   }
 
@@ -56,19 +56,6 @@ export class BooksController {
       throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
     }
 
-    return this.mapToDto(book);
-  }
-
-  private mapToDto(book: Book): BookResponseDto {
-    return {
-      id: book.id,
-      title: book.title,
-      author: book.author,
-      year: book.year,
-      price: book.price,
-      genre: book.genre,
-      description: book.description,
-      isbn: book.isbn,
-    };
+    return BookMapper.toDto(book);
   }
 }

@@ -27,7 +27,7 @@ export class UsersService {
       include: { book: true },
     });
 
-    return saved.map((s) => ({
+    return saved.map((s: { book: { id: string; title: string; author: string; year: number; price: number; genre: string; description: string; isbn: string | null } }) => ({
       id: s.book.id,
       title: s.book.title,
       author: s.book.author,
@@ -80,7 +80,7 @@ export class UsersService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return reviews.map((r) => ({
+    return reviews.map((r: { id: string; userId: string; bookId: string; rating: number; comment: string; createdAt: Date; book: { title: string } }) => ({
       id: r.id,
       userId: r.userId,
       bookId: r.bookId,
@@ -109,7 +109,7 @@ export class UsersService {
     });
 
     return Promise.all(
-      reviews.map(async (r) => {
+      reviews.map(async (r: { id: string; userId: string; bookId: string; rating: number; comment: string; createdAt: Date }) => {
         const user = await this.getUser(r.userId);
         return {
           id: r.id,

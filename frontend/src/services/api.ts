@@ -41,6 +41,7 @@ export const cartApi = {
     updateItem: (userId: string, bookId: string, quantity: number) => api.put(`/cart/${userId}/items/${bookId}`, { quantity }),
     removeItem: (userId: string, bookId: string) => api.delete(`/cart/${userId}/items/${bookId}`),
     clearCart: (userId: string) => api.delete(`/cart/${userId}`),
+    checkout: (userId: string) => api.post(`/cart/${userId}/checkout`),
 };
 
 export const authApi = {

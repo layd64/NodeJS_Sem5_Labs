@@ -66,6 +66,13 @@ export class AuthService {
     };
   }
 
+  async getUserProfileWithoutPassword(userId: string): Promise<Omit<User, 'password'> | undefined> {
+    const user = await this.getUserProfile(userId);
+    if (!user) return undefined;
+    const { password, ...profile } = user;
+    return profile;
+  }
+
   async updateUser(userId: string, updates: Partial<User>): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },

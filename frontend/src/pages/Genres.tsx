@@ -1,26 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { booksApi } from '../services/api';
+import { useGenres } from '../hooks/useGenres';
 
 const Genres: React.FC = () => {
-    const [genres, setGenres] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        const fetchGenres = async () => {
-            try {
-                const response = await booksApi.getGenres();
-                setGenres(response.data.genres || []);
-            } catch (err: any) {
-                setError(err.message || 'Failed to fetch genres');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGenres();
-    }, []);
+    const { genres, loading, error } = useGenres();
 
     return (
         <section>

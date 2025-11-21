@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
+import { Link } from 'react-router-dom';
+import { useRegister } from '../hooks/useRegister';
 
 const Register: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
-    const [error, setError] = useState('');
-    const { login } = useAuth();
-    const navigate = useNavigate();
+    const { registerUser, error, loading } = useRegister();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
-
         try {
-            const response = await api.post('/auth/register', { email, password, name });
-            // Assuming backend returns same structure as login
-            login(response.data.token, response.data.user);
-            navigate('/');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Помилка реєстрації');
+            await registerUser(email, password, name);
+        } catch (err) {
+            // Error is handled by the hook
         }
     };
 
@@ -56,7 +48,9 @@ const Register: React.FC = () => {
                         required
                     />
                 </div>
-                <button type="submit">Зареєструватися</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Завантаження...' : 'Зареєструватися'}
+                </button>
             </form>
             <p style={{ marginTop: '1rem' }}>
                 Вже маєте акаунт? <Link to="/login">Увійти</Link>

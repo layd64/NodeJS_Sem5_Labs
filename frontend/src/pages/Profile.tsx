@@ -1,73 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { usersApi, authApi } from '../services/api';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-
-interface UserProfile {
-    id: string;
-    email: string;
-    name: string;
-}
-
-interface SavedBook {
-    id: string;
-    title: string;
-    author: string;
-    price: number;
-}
-
-interface UserReview {
-    id: string;
-    rating: number;
-    comment: string;
-    book: {
-        title: string;
-    };
-    createdAt: string;
-}
+import { useProfile } from '../hooks/useProfile';
 
 const Profile: React.FC = () => {
-    const { user, isAuthenticated } = useAuth();
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
-    const [reviews, setReviews] = useState<UserReview[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { isAuthenticated } = useAuth();
+    const { profile, savedBooks, reviews, loading, removeSavedBook } = useProfile();
 
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            fetchData();
-        } else {
-            setLoading(false);
-        }
-    }, [isAuthenticated, user]);
-
-    const fetchData = async () => {
-        if (!user) return;
-        setLoading(true);
+    const handleRemoveSavedBook = async (bookId: string) => {
         try {
-            const [profileRes, savedRes, reviewsRes] = await Promise.all([
-                authApi.getProfile(user.id),
-                usersApi.getSavedBooks(user.id),
-                usersApi.getReviews(user.id)
-            ]);
-            setProfile(profileRes.data);
-            // API returns { books: [...] }
-            setSavedBooks((savedRes.data as any).books || []);
-            setReviews(reviewsRes.data.reviews || []);
-        } catch (err) {
-            console.error('Failed to fetch profile data', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const removeSavedBook = async (bookId: string) => {
-        if (!user) return;
-        try {
-            await usersApi.removeSavedBook(user.id, bookId);
-            fetchData(); // Refresh list
-        } catch (err) {
-            alert('Failed to remove book');
+            await removeSavedBook(bookId);
+        } catch (err: any) {
+            alert('Помилка: ' + (err.message || 'Не вдалося видалити книгу'));
         }
     };
 
@@ -105,7 +49,7 @@ const Profile: React.FC = () => {
                                 <h3><Link to={`/books/${book.id}`}>{book.title}</Link></h3>
                                 <p><strong>Автор:</strong> {book.author}</p>
                                 <p className="book-price">{book.price} грн</p>
-                                <button className="btn-danger" onClick={() => removeSavedBook(book.id)}>Видалити</button>
+                                <button className="btn-danger" onClick={() => handleRemoveSavedBook(book.id)}>Видалити</button>
                             </div>
                         ))}
                     </div>

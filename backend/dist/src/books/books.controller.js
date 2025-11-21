@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BooksController = void 0;
 const common_1 = require("@nestjs/common");
 const book_dto_1 = require("../common/dto/book.dto");
+const book_mapper_1 = require("../common/mappers/book.mapper");
 const users_service_1 = require("../users/users.service");
 const books_service_1 = require("./books.service");
 let BooksController = class BooksController {
@@ -26,7 +27,7 @@ let BooksController = class BooksController {
     }
     async findAll(query) {
         const books = await this.booksService.findAll(query);
-        const booksDto = books.map((book) => this.mapToDto(book));
+        const booksDto = book_mapper_1.BookMapper.toDtoList(books);
         return {
             books: booksDto,
             total: booksDto.length,
@@ -41,7 +42,7 @@ let BooksController = class BooksController {
         const book = await this.booksService.findOne(bookId);
         return {
             reviews,
-            book: book ? this.mapToDto(book) : undefined,
+            book: book ? book_mapper_1.BookMapper.toDto(book) : undefined,
         };
     }
     async findOne(id) {
@@ -49,19 +50,7 @@ let BooksController = class BooksController {
         if (!book) {
             throw new common_1.HttpException('Book not found', common_1.HttpStatus.NOT_FOUND);
         }
-        return this.mapToDto(book);
-    }
-    mapToDto(book) {
-        return {
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            year: book.year,
-            price: book.price,
-            genre: book.genre,
-            description: book.description,
-            isbn: book.isbn,
-        };
+        return book_mapper_1.BookMapper.toDto(book);
     }
 };
 exports.BooksController = BooksController;

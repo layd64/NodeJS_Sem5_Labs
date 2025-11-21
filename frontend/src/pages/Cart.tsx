@@ -1,72 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { cartApi } from '../services/api';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-
-interface CartItem {
-    bookId: string;
-    book: {
-        title: string;
-        price: number;
-    };
-    quantity: number;
-}
+import { useCart } from '../hooks/useCart';
 
 const Cart: React.FC = () => {
-    const [items, setItems] = useState<CartItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const { user, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
+    const { items, loading, error, total, updateQuantity, removeItem, clearCart, checkout } = useCart();
 
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            fetchCart();
-        } else {
-            setLoading(false);
-        }
-    }, [isAuthenticated, user]);
-
-    const fetchCart = async () => {
-        if (!user) return;
+    const handleUpdateQuantity = async (bookId: string, newQuantity: number) => {
         try {
-            const response = await cartApi.getCart(user.id);
-            setItems(response.data.items || []);
+            await updateQuantity(bookId, newQuantity);
         } catch (err: any) {
-            setError(err.message || 'Failed to fetch cart');
-        } finally {
-            setLoading(false);
+            alert('Помилка: ' + (err.message || 'Не вдалося оновити кількість'));
         }
     };
 
-    const updateQuantity = async (bookId: string, newQuantity: number) => {
-        if (!user) return;
-        if (newQuantity < 1) return;
+    const handleRemoveItem = async (bookId: string) => {
         try {
-            await cartApi.updateItem(user.id, bookId, newQuantity);
-            fetchCart();
-        } catch (err) {
-            alert('Failed to update quantity');
+            await removeItem(bookId);
+        } catch (err: any) {
+            alert('Помилка: ' + (err.message || 'Не вдалося видалити товар'));
         }
     };
 
-    const removeItem = async (bookId: string) => {
-        if (!user) return;
-        try {
-            await cartApi.removeItem(user.id, bookId);
-            fetchCart();
-        } catch (err) {
-            alert('Failed to remove item');
-        }
-    };
-
-    const clearCart = async () => {
-        if (!user) return;
+    const handleClearCart = async () => {
         if (!window.confirm('Ви впевнені, що хочете очистити кошик?')) return;
         try {
-            await cartApi.clearCart(user.id);
-            setItems([]);
-        } catch (err) {
-            alert('Failed to clear cart');
+            await clearCart();
+        } catch (err: any) {
+            alert('Помилка: ' + (err.message || 'Не вдалося очистити кошик'));
+        }
+    };
+
+    const handleCheckout = async () => {
+        if (items.length === 0) {
+            alert('Кошик порожній');
+            return;
+        }
+        if (!window.confirm(`Оформити замовлення на суму ${total} грн?`)) return;
+        try {
+            const result = await checkout();
+            alert(`Замовлення успішно оформлено! Сума: ${result.total} грн`);
+        } catch (err: any) {
+            alert('Помилка: ' + (err.message || 'Не вдалося оформити замовлення'));
         }
     };
 
@@ -81,8 +57,6 @@ const Cart: React.FC = () => {
 
     if (loading) return <div className="loading">Завантаження...</div>;
     if (error) return <div className="error">{error}</div>;
-
-    const total = items.reduce((sum, item) => sum + item.book.price * item.quantity, 0);
 
     return (
         <section>
@@ -111,13 +85,13 @@ const Cart: React.FC = () => {
                                             type="number"
                                             min="1"
                                             value={item.quantity}
-                                            onChange={(e) => updateQuantity(item.bookId, parseInt(e.target.value))}
+                                            onChange={(e) => handleUpdateQuantity(item.bookId, parseInt(e.target.value))}
                                             style={{ width: '60px' }}
                                         />
                                     </td>
                                     <td>{item.book.price * item.quantity} грн</td>
                                     <td>
-                                        <button className="btn-danger" onClick={() => removeItem(item.bookId)}>Видалити</button>
+                                        <button className="btn-danger" onClick={() => handleRemoveItem(item.bookId)}>Видалити</button>
                                     </td>
                                 </tr>
                             ))}
@@ -127,8 +101,8 @@ const Cart: React.FC = () => {
                         Загалом: {total} грн
                     </div>
                     <div style={{ marginTop: '1rem', textAlign: 'right' }}>
-                        <button className="btn-danger" onClick={clearCart}>Очистити кошик</button>
-                        <button className="btn-success" style={{ marginLeft: '1rem' }}>Оформити замовлення</button>
+                        <button className="btn-danger" onClick={handleClearCart}>Очистити кошик</button>
+                        <button className="btn-success" style={{ marginLeft: '1rem' }} onClick={handleCheckout}>Оформити замовлення</button>
                     </div>
                 </>
             )}

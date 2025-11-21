@@ -53,6 +53,14 @@ let CartController = class CartController {
     async clearCart(userId) {
         await this.cartService.clearCart(userId);
     }
+    async checkout(userId) {
+        try {
+            return await this.cartService.checkout(userId);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error instanceof Error ? error.message : 'Failed to checkout', common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
 };
 exports.CartController = CartController;
 __decorate([
@@ -97,6 +105,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CartController.prototype, "clearCart", null);
+__decorate([
+    (0, common_1.Post)(':userId/checkout'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CartController.prototype, "checkout", null);
 exports.CartController = CartController = __decorate([
     (0, common_1.Controller)('cart'),
     __metadata("design:paramtypes", [cart_service_1.CartService])

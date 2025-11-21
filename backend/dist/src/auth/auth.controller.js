@@ -38,11 +38,10 @@ let AuthController = class AuthController {
         }
     }
     async getProfile(userId) {
-        const user = await this.authService.getUserProfile(userId);
-        if (!user) {
+        const profile = await this.authService.getUserProfileWithoutPassword(userId);
+        if (!profile) {
             throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
         }
-        const { password, ...profile } = user;
         return profile;
     }
 };

@@ -1,102 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { booksApi, cartApi, usersApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-
-interface Book {
-    id: string;
-    title: string;
-    author: string;
-    genre: string;
-    year: number;
-    price: number;
-    description?: string;
-}
-
-interface Review {
-    id: string;
-    rating: number;
-    comment: string;
-    user: { name: string };
-    createdAt: string;
-}
+import { useBookDetail } from '../hooks/useBookDetail';
+import { useReviews } from '../hooks/useReviews';
+import { useCartActions } from '../hooks/useCartActions';
 
 const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [book, setBook] = useState<Book | null>(null);
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const { user, isAuthenticated } = useAuth();
+    const { book, loading, error } = useBookDetail(id);
+    const { reviews, submitReview } = useReviews(id);
+    const { addToCart, addToSaved } = useCartActions();
+    const { isAuthenticated } = useAuth();
 
     // Review form state
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
 
-    useEffect(() => {
-        if (id) {
-            fetchBook(id);
-            fetchReviews(id);
-        }
-    }, [id]);
-
-    const fetchBook = async (bookId: string) => {
+    const handleAddToCart = async () => {
+        if (!book) return;
         try {
-            const response = await booksApi.getById(bookId);
-            setBook(response.data);
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch book');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchReviews = async (bookId: string) => {
-        try {
-            const response = await booksApi.getReviews(bookId);
-            setReviews(response.data.reviews || []);
-        } catch (err) {
-            console.error('Failed to fetch reviews', err);
-        }
-    };
-
-    const addToCart = async () => {
-        if (!isAuthenticated || !user || !book) {
-            alert('Будь ласка, увійдіть в систему');
-            return;
-        }
-        try {
-            await cartApi.addItem(user.id, book.id, 1);
+            await addToCart(book.id);
             alert('Книжку додано до кошика!');
         } catch (err: any) {
-            alert('Помилка: ' + (err.response?.data?.message || err.message));
+            alert('Помилка: ' + (err.message || 'Не вдалося додати до кошика'));
         }
     };
 
-    const addToSaved = async () => {
-        if (!isAuthenticated || !user || !book) {
-            alert('Будь ласка, увійдіть в систему');
-            return;
-        }
+    const handleAddToSaved = async () => {
+        if (!book) return;
         try {
-            await usersApi.addSavedBook(user.id, book.id);
+            await addToSaved(book.id);
             alert('Книжку додано до збережених!');
         } catch (err: any) {
-            alert('Помилка: ' + (err.response?.data?.message || err.message));
+            alert('Помилка: ' + (err.message || 'Не вдалося додати до збережених'));
         }
     };
 
-    const submitReview = async (e: React.FormEvent) => {
+    const handleSubmitReview = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAuthenticated || !user || !id) return;
+        if (!isAuthenticated || !id) return;
 
         try {
-            await usersApi.createReview(user.id, { bookId: id, rating, comment });
+            await submitReview(rating, comment);
             alert('Відгук додано!');
             setComment('');
-            fetchReviews(id);
         } catch (err: any) {
-            alert('Помилка: ' + (err.response?.data?.message || err.message));
+            alert('Помилка: ' + (err.message || 'Не вдалося додати відгук'));
         }
     };
 
@@ -116,8 +65,8 @@ const BookDetail: React.FC = () => {
             <div className="book-actions">
                 {isAuthenticated ? (
                     <>
-                        <button onClick={addToCart}>До кошика</button>
-                        <button onClick={addToSaved}>Зберегти</button>
+                        <button onClick={handleAddToCart}>До кошика</button>
+                        <button onClick={handleAddToSaved}>Зберегти</button>
                     </>
                 ) : (
                     <p><Link to="/login">Увійдіть</Link>, щоб купити або зберегти.</p>
@@ -145,7 +94,7 @@ const BookDetail: React.FC = () => {
                 {isAuthenticated && (
                     <div id="add-review-form" style={{ marginTop: '2rem' }}>
                         <h3>Додати відгук</h3>
-                        <form onSubmit={submitReview}>
+                        <form onSubmit={handleSubmitReview}>
                             <div className="form-group">
                                 <label>Рейтинг (1-5):</label>
                                 <input

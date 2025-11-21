@@ -7,6 +7,7 @@ export declare class AuthService {
     register(registerDto: RegisterDto): Promise<AuthResponseDto>;
     login(loginDto: LoginDto): Promise<AuthResponseDto>;
     getUserProfile(userId: string): Promise<User | undefined>;
+    getUserProfileWithoutPassword(userId: string): Promise<Omit<User, 'password'> | undefined>;
     updateUser(userId: string, updates: Partial<User>): Promise<void>;
     private generateToken;
 }

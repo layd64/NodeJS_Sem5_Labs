@@ -51,6 +51,6 @@ export class BooksService {
       distinct: ['genre'],
       orderBy: { genre: 'asc' },
     });
-    return genres.map((g) => g.genre);
+    return genres.map((g: { genre: string }) => g.genre);
   }
 }

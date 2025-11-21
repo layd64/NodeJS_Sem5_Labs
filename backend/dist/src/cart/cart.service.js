@@ -78,6 +78,19 @@ let CartService = class CartService {
         await this.ensureCart(userId);
         await this.prisma.cartItem.deleteMany({ where: { cartId: userId } });
     }
+    async checkout(userId) {
+        await this.ensureCart(userId);
+        const items = await this.getCartItemsDetailed(userId);
+        if (items.length === 0) {
+            throw new common_1.HttpException('Cart is empty', common_1.HttpStatus.BAD_REQUEST);
+        }
+        const total = this.calculateTotal(items);
+        await this.prisma.cartItem.deleteMany({ where: { cartId: userId } });
+        return {
+            message: 'Order placed successfully',
+            total,
+        };
+    }
     async ensureCart(userId) {
         await this.prisma.cart.upsert({
             where: { userId },

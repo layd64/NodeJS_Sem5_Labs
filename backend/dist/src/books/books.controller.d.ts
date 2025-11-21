@@ -15,5 +15,4 @@ export declare class BooksController {
         book?: BookResponseDto;
     }>;
     findOne(id: string): Promise<BookResponseDto>;
-    private mapToDto;
 }

@@ -87,6 +87,25 @@ export class CartService {
     await this.prisma.cartItem.deleteMany({ where: { cartId: userId } });
   }
 
+  async checkout(userId: string): Promise<{ message: string; total: number }> {
+    await this.ensureCart(userId);
+    const items = await this.getCartItemsDetailed(userId);
+    
+    if (items.length === 0) {
+      throw new HttpException('Cart is empty', HttpStatus.BAD_REQUEST);
+    }
+
+    const total = this.calculateTotal(items);
+    
+    // Clear the cart after checkout
+    await this.prisma.cartItem.deleteMany({ where: { cartId: userId } });
+    
+    return {
+      message: 'Order placed successfully',
+      total,
+    };
+  }
+
   private async ensureCart(userId: string): Promise<void> {
     await this.prisma.cart.upsert({
       where: { userId },
@@ -101,7 +120,7 @@ export class CartService {
       include: { book: true },
     });
 
-    return rows.map((row) => ({
+    return rows.map((row: { bookId: string; quantity: number; book: { id: string; title: string; author: string; price: number } }) => ({
       bookId: row.bookId,
       quantity: row.quantity,
       book: {

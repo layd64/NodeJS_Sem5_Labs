@@ -79,4 +79,17 @@ export class CartController {
   async clearCart(@Param('userId') userId: string): Promise<void> {
     await this.cartService.clearCart(userId);
   }
+
+  @Post(':userId/checkout')
+  @HttpCode(HttpStatus.OK)
+  async checkout(@Param('userId') userId: string): Promise<{ message: string; total: number }> {
+    try {
+      return await this.cartService.checkout(userId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Failed to checkout',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

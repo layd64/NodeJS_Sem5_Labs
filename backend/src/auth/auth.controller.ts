@@ -46,12 +46,11 @@ export class AuthController {
 
   @Get('profile/:userId')
   async getProfile(@Param('userId') userId: string): Promise<Omit<UserProfile, 'password'>> {
-    const user = await this.authService.getUserProfile(userId);
-    if (!user) {
+    const profile = await this.authService.getUserProfileWithoutPassword(userId);
+    if (!profile) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const { password, ...profile } = user;
     return profile;
   }
 }
