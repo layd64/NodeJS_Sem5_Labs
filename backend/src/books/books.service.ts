@@ -5,7 +5,7 @@ import { PrismaService } from '../common/services/prisma.service';
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(filters?: BookFilters): Promise<Book[]> {
     const where: any = {};

@@ -21,9 +21,7 @@ describe('BooksController (e2e)', () => {
     });
     let firstBookId;
     it('/api/books (GET)', async () => {
-        const response = await (0, supertest_1.default)(app.getHttpServer())
-            .get('/api/books')
-            .expect(200);
+        const response = await (0, supertest_1.default)(app.getHttpServer()).get('/api/books').expect(200);
         expect(response.body).toHaveProperty('books');
         expect(response.body).toHaveProperty('total');
         expect(Array.isArray(response.body.books)).toBe(true);
@@ -32,9 +30,7 @@ describe('BooksController (e2e)', () => {
         }
     });
     it('/api/books/genres (GET)', async () => {
-        const response = await (0, supertest_1.default)(app.getHttpServer())
-            .get('/api/books/genres')
-            .expect(200);
+        const response = await (0, supertest_1.default)(app.getHttpServer()).get('/api/books/genres').expect(200);
         expect(response.body).toHaveProperty('genres');
         expect(Array.isArray(response.body.genres)).toBe(true);
     });
@@ -51,9 +47,7 @@ describe('BooksController (e2e)', () => {
         expect(response.body).toHaveProperty('author');
     });
     it('/api/books/:id (GET) - Not Found', async () => {
-        await (0, supertest_1.default)(app.getHttpServer())
-            .get('/api/books/non-existent-id')
-            .expect(404);
+        await (0, supertest_1.default)(app.getHttpServer()).get('/api/books/non-existent-id').expect(404);
     });
 });
 //# sourceMappingURL=books.e2e-spec.js.map

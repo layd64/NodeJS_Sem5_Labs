@@ -1,5 +1,5 @@
-import { Book } from '../interfaces/book.interface';
 import { BookResponseDto } from '../dto/book.dto';
+import { Book } from '../interfaces/book.interface';
 
 export class BookMapper {
   static toDto(book: Book): BookResponseDto {
@@ -19,4 +19,3 @@ export class BookMapper {
     return books.map((book) => this.toDto(book));
   }
 }
-

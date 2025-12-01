@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query } from '@nestjs/common';
 
 import { BookListResponseDto, BookQueryDto, BookResponseDto } from '../common/dto/book.dto';
 import { ReviewResponseDto } from '../common/dto/review.dto';
@@ -25,7 +18,7 @@ export class BooksController {
   async findAll(@Query() query: BookQueryDto): Promise<BookListResponseDto> {
     const books = await this.booksService.findAll(query);
     const booksDto = BookMapper.toDtoList(books);
-    
+
     return {
       books: booksDto,
       total: booksDto.length,
@@ -39,7 +32,9 @@ export class BooksController {
   }
 
   @Get(':id/reviews')
-  async getBookReviews(@Param('id') bookId: string): Promise<{ reviews: ReviewResponseDto[]; book?: BookResponseDto }> {
+  async getBookReviews(
+    @Param('id') bookId: string,
+  ): Promise<{ reviews: ReviewResponseDto[]; book?: BookResponseDto }> {
     const reviews = await this.usersService.getBookReviews(bookId);
     const book = await this.booksService.findOne(bookId);
 

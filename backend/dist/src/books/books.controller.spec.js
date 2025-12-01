@@ -44,7 +44,18 @@ describe('BooksController', () => {
     describe('findAll', () => {
         it('should return a list of books', async () => {
             const query = { page: 1, limit: 10 };
-            const result = [{ id: '1', title: 'Test Book', author: 'Author', year: 2021, price: 10, genre: 'Fiction', description: 'Desc', isbn: '123' }];
+            const result = [
+                {
+                    id: '1',
+                    title: 'Test Book',
+                    author: 'Author',
+                    year: 2021,
+                    price: 10,
+                    genre: 'Fiction',
+                    description: 'Desc',
+                    isbn: '123',
+                },
+            ];
             mockBooksService.findAll.mockResolvedValue(result);
             const response = await controller.findAll(query);
             expect(response).toEqual({
@@ -67,7 +78,16 @@ describe('BooksController', () => {
         it('should return reviews and book details', async () => {
             const bookId = '1';
             const reviews = [{ id: '1', content: 'Great book' }];
-            const book = { id: '1', title: 'Test Book', author: 'Author', year: 2021, price: 10, genre: 'Fiction', description: 'Desc', isbn: '123' };
+            const book = {
+                id: '1',
+                title: 'Test Book',
+                author: 'Author',
+                year: 2021,
+                price: 10,
+                genre: 'Fiction',
+                description: 'Desc',
+                isbn: '123',
+            };
             mockUsersService.getBookReviews.mockResolvedValue(reviews);
             mockBooksService.findOne.mockResolvedValue(book);
             const response = await controller.getBookReviews(bookId);
@@ -95,7 +115,16 @@ describe('BooksController', () => {
     describe('findOne', () => {
         it('should return a book if found', async () => {
             const id = '1';
-            const book = { id: '1', title: 'Test Book', author: 'Author', year: 2021, price: 10, genre: 'Fiction', description: 'Desc', isbn: '123' };
+            const book = {
+                id: '1',
+                title: 'Test Book',
+                author: 'Author',
+                year: 2021,
+                price: 10,
+                genre: 'Fiction',
+                description: 'Desc',
+                isbn: '123',
+            };
             mockBooksService.findOne.mockResolvedValue(book);
             const response = await controller.findOne(id);
             expect(response).toEqual(book);

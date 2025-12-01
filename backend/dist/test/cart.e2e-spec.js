@@ -67,9 +67,7 @@ describe('CartController (e2e)', () => {
         expect(response.body.items[0].quantity).toBe(1);
     });
     it('/api/cart/:userId (GET)', async () => {
-        const response = await (0, supertest_1.default)(app.getHttpServer())
-            .get(`/api/cart/${userId}`)
-            .expect(200);
+        const response = await (0, supertest_1.default)(app.getHttpServer()).get(`/api/cart/${userId}`).expect(200);
         expect(response.body).toHaveProperty('items');
         expect(response.body.items).toHaveLength(1);
         expect(response.body.total).toBeGreaterThan(0);
@@ -94,12 +92,8 @@ describe('CartController (e2e)', () => {
         await (0, supertest_1.default)(app.getHttpServer())
             .post(`/api/cart/${userId}/items`)
             .send({ bookId: testBook.id, quantity: 1 });
-        await (0, supertest_1.default)(app.getHttpServer())
-            .delete(`/api/cart/${userId}`)
-            .expect(204);
-        const response = await (0, supertest_1.default)(app.getHttpServer())
-            .get(`/api/cart/${userId}`)
-            .expect(200);
+        await (0, supertest_1.default)(app.getHttpServer()).delete(`/api/cart/${userId}`).expect(204);
+        const response = await (0, supertest_1.default)(app.getHttpServer()).get(`/api/cart/${userId}`).expect(200);
         expect(response.body.items).toHaveLength(0);
     });
 });

@@ -75,8 +75,8 @@ describe('BooksService', () => {
                 where: {
                     price: {
                         gte: 10,
-                        lte: 20
-                    }
+                        lte: 20,
+                    },
                 },
                 orderBy: { title: 'asc' },
             });
@@ -90,7 +90,7 @@ describe('BooksService', () => {
                 where: {
                     price: {
                         gte: 10,
-                    }
+                    },
                 },
                 orderBy: { title: 'asc' },
             });
@@ -104,7 +104,7 @@ describe('BooksService', () => {
                 where: {
                     price: {
                         lte: 20,
-                    }
+                    },
                 },
                 orderBy: { title: 'asc' },
             });
