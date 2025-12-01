@@ -1,11 +1,15 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const envApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('envApiUrl:', envApiUrl);
+const API_URL = envApiUrl.endsWith('/api') ? envApiUrl : `${envApiUrl}/api`;
+console.log('Final API_URL:', API_URL);
 
 if (import.meta.env.PROD && API_URL.includes('localhost')) {
   console.warn(
     'WARNING: Running in production mode but API_URL is set to localhost. ' +
-      'Ensure VITE_API_URL environment variable is set correctly.',
+    'Ensure VITE_API_URL environment variable is set correctly.',
   );
 }
 
