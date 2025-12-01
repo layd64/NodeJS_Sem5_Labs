@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("@nestjs/common");
 const testing_1 = require("@nestjs/testing");
+const users_service_1 = require("../users/users.service");
 const books_controller_1 = require("./books.controller");
 const books_service_1 = require("./books.service");
-const users_service_1 = require("../users/users.service");
-const common_1 = require("@nestjs/common");
 describe('BooksController', () => {
     let controller;
     let booksService;

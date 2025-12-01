@@ -35,7 +35,7 @@ describe('AppController (e2e)', () => {
         });
     });
     it('should be able to query database directly', async () => {
-        const result = (await prismaService.$queryRaw `SELECT 1 as result`);
+        const result = await prismaService.$queryRaw `SELECT 1 as result`;
         expect(result).toBeDefined();
         expect(Array.isArray(result)).toBe(true);
         expect(result[0]['result']).toBe(1);

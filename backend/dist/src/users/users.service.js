@@ -14,8 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../common/services/prisma.service");
 const auth_service_1 = require("../auth/auth.service");
+const prisma_service_1 = require("../common/services/prisma.service");
 let UsersService = class UsersService {
     authService;
     prisma;

@@ -46,6 +46,6 @@ describe('AppController (e2e)', () => {
     const result = await prismaService.$queryRaw`SELECT 1 as result`;
     expect(result).toBeDefined();
     expect(Array.isArray(result)).toBe(true);
-    expect(result[0]['result']).toBe(1);
+    expect((result as any)[0]['result']).toBe(1);
   });
 });

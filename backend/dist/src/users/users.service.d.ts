@@ -1,7 +1,7 @@
+import { AuthService } from '../auth/auth.service';
 import { BookResponseDto } from '../common/dto/book.dto';
 import { CreateReviewDto, ReviewResponseDto } from '../common/dto/review.dto';
 import { PrismaService } from '../common/services/prisma.service';
-import { AuthService } from '../auth/auth.service';
 export declare class UsersService {
     private readonly authService;
     private readonly prisma;

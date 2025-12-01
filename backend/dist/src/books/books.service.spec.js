@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const books_service_1 = require("./books.service");
 const prisma_service_1 = require("../common/services/prisma.service");
+const books_service_1 = require("./books.service");
 describe('BooksService', () => {
     let service;
     let prismaService;
