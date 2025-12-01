@@ -9,7 +9,7 @@ console.log('Final API_URL:', API_URL);
 if (import.meta.env.PROD && API_URL.includes('localhost')) {
   console.warn(
     'WARNING: Running in production mode but API_URL is set to localhost. ' +
-    'Ensure VITE_API_URL environment variable is set correctly.',
+      'Ensure VITE_API_URL environment variable is set correctly.',
   );
 }
 
